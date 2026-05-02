@@ -10,6 +10,10 @@ import { clerkWebhookHandler } from './middleware/clerk.js';
 import { getEnv } from './lib/env.js';
 import keepAliveCron from './lib/cron.js';
 
+import productRouter from './routes/productRouter.js';
+import meRouter from './routes/meRouter.js';
+import streamRouter from './routes/streamRouter.js';
+
 const env = getEnv();
 const app = express();
 
@@ -26,9 +30,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(clerkMiddleware());
 
+// Route to keep server alive (for platforms like Render that may put the server to sleep after inactivity)
 app.get('/health', (_req, res) => {
 	res.json({ ok: true });
 });
+
+// API routes
+app.use('/api/me', meRouter);
+app.use('/api/products', productRouter);
+app.use('/api/stream', streamRouter);
 
 const publicDir = path.join(process.cwd(), 'public');
 
